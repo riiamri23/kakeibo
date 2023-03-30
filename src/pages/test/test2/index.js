@@ -28,7 +28,7 @@ async function getData(){
     // console.log(headings);
 
     // data of each row is associated to the headings
-    let data = json.table.rows.map(item => {
+    let data = json.table.rows.map((item, i) => {
         // console.log(item);
         let row = {};
         // item.c.forEach((cell, idx) => {
@@ -37,6 +37,7 @@ async function getData(){
         //     console.log('cell', cell);
         //     if(cell) row[headings[idx]] = cell?.v;
         // });
+        row['key'] = i;
         headings.forEach((label, idx) => {
             if(typeof item?.c?.[idx]?.v === 'string' && item?.c?.[idx]?.v?.match(/Date/)) item.c[idx].v = getFormattedDate(item?.c?.[idx]?.v);
             row[label] = item?.c?.[idx]?.v;
@@ -80,40 +81,70 @@ const InputForm = ({label, type = 'text', formInput ={}, onSetFormInput})=>{
 export default function Test2() {
 
     const [response, setResponse] = useState({});
-    const [modalShow, setModalShow] = useState({isShow: false, flag: '', data: {}});
+    const [modalShow, setModalShow] = useState({isShow: false, flag: ''});
     const [formInput, setFormInput] = useState({});
 
+
+    const fetchData = async () =>{
+        const res = await getData();
+        setFormInput(()=>{
+            const formTemp = {};
+            res.header.forEach((val,index)=>{
+                formTemp[val] = '';
+                formTemp['key'] = index; 
+                if(val === 'createdby') formTemp[val] = 'myself';
+                if(val === 'created_date') formTemp[val] = new Date().toLocaleString();
+            });
+
+            return formTemp;
+        });
+        setResponse(res);
+    }
 
     async function handleSubmit(event){
         event.preventDefault();
         // https://sheets.googleapis.com/v4/spreadsheets/1J-pkY_Jtv63v9USbCNHRJj6iVyGDp9mg9bS42eRR4-Y/values/A4:append
         // console.log('hlloe');
-        console.log(JSON.stringify(formInput));
-        fetch("https://sheet.best/api/sheets/2e01693a-245d-4831-956e-b82292e8ba39", {
-            method: "POST",
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(formInput)
-        }).then(response => response.text())
-            .then(console.log);
+        // console.log(JSON.stringify(formInput));
+        if(modalShow.flag === 'add'){
+            fetch("https://sheet.best/api/sheets/2e01693a-245d-4831-956e-b82292e8ba39", {
+                method: "POST",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(formInput)
+            }).then(response => response.text())
+            .then(()=>{
+                setModalShow({isShow: false, flag: '', data: {}});
+                fetchData();
+            });
+
+        }else if(modalShow.flag === 'update'){
+            fetch(`https://sheet.best/api/sheets/2e01693a-245d-4831-956e-b82292e8ba39/${formInput?.key}`, {
+                method: "PUT",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(formInput)
+            }).then(response => response.text())
+            .then(()=>{
+                setModalShow({isShow: false, flag: '', data: {}});
+                fetchData();
+            });
+
+        }else if(modalShow.flag === 'delete'){
+            fetch(`https://sheet.best/api/sheets/2e01693a-245d-4831-956e-b82292e8ba39/${formInput?.key}`, {
+                method: "DELETE",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(formInput)
+            }).then(response => response.text())
+            .then(()=>{
+                setModalShow({isShow: false, flag: '', data: {}});
+                fetchData();
+            });
+        }else {
+            console.log('this is else, reported, i can do anything');
+        }
 
     }
 
     useEffect(()=>{
-        const fetchData = async () =>{
-            const res = await getData();
-            setFormInput(()=>{
-                const formTemp = {};
-                res.header.forEach((val)=>{
-                    formTemp[val] = '';
-                    if(val === 'createdby') formTemp[val] = 'myself';
-                    if(val === 'created_date') formTemp[val] = new Date().toLocaleString();
-                });
-
-                return formTemp;
-            });
-            setResponse(res);
-        }
-
         fetchData();
     },[]);
 
@@ -128,7 +159,7 @@ export default function Test2() {
                             {
                             response?.header?.length > 0
                                 ?<tr>
-                                    <th key="action" className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer"><a href={() => false} onClick={()=>setModalShow({isShow: true, flag: 'add', data: {}})}>Add</a>
+                                    <th key="action" className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer"><a href={() => false} onClick={()=>setModalShow({isShow: true, flag: 'add'})}>Add</a>
                                 </th>
                                 {
                                     response?.header?.map((val, idx)=>{
@@ -143,8 +174,16 @@ export default function Test2() {
                                 response?.data?.length > 0
                                     ? response?.data?.map((val, idx)=>{
                                         return <tr key={`label${idx}`}>
-                                            <td key={`edit${idx}`} className="px-6 py-4 whitespace-nowrap cursor-pointer"><a href={() => false} onClick={()=>setModalShow({isShow: true, flag: 'edit', data: val})}>Edit</a> | <a href={() => false} onClick={()=>setModalShow({isShow: true, flag: 'delete', data: val})}>Delete</a></td>
+                                            <td key={`update${idx}`} className="px-6 py-4 whitespace-nowrap cursor-pointer">
+                                                <a href={() => false} onClick={()=>{
+                                                    setFormInput(val);
+                                                    setModalShow({isShow: true, flag: 'update'});
+                                                    
+                                                }}>Edit</a> | 
+                                                <a href={() => false} onClick={()=>{setModalShow({isShow: true, flag: 'delete'}); }}>Delete</a>
+                                            </td>
                                             {Object.keys(val).map((val2, idx2)=>{
+                                                if(!val2 || val2 === 'key') return null;
                                                 return <td key={`${val2}${idx2}`} className="px-6 py-4 whitespace-nowrap">{val?.[val2]}</td>
                                             })}
                                         </tr>
@@ -168,7 +207,7 @@ export default function Test2() {
 
                         <form onSubmit={handleSubmit}>
                         <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                            {modalShow?.flag === 'add' || modalShow?.flag === 'edit' 
+                            {modalShow?.flag === 'add' || modalShow?.flag === 'update' 
                                 ? response?.header?.length > 0 && <>
                                     {response?.header?.map((val, idx)=>{
                                         if(val === 'createdby' || val === 'created_date') return null;
