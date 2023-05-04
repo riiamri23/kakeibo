@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import {getDataExpenses} from "../../services/budgetService";
+import {getDataBudget, getDataExpenses} from "../../services/budgetService";
 
 export default function Home() {
 
   const [dataExpense, setDataExpense] = useState({});
+  const [dataBudget, setDataBudget] = useState({});
 
   useEffect(()=>{
     // const fetchDataExpense = async ()=>{
@@ -20,7 +21,16 @@ export default function Home() {
       console.log(response);
       setDataExpense(response);
     }
+
+    const fetchDataBudget = async ()=>{
+      const response = await getDataBudget('Februari');
+      console.log(response);
+      setDataBudget(response);
+    }
+
+    // run function fetch
     fetchDataExpense();
+    fetchDataBudget();
   }, []);
 
   return (<><div className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-50 py-12 space-y-6 px-5">
