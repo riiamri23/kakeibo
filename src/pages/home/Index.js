@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import {getDataBudget, getDataExpenses} from "../../services/budgetService";
-import { getMonthName } from "../../utils/utilsFunction";
+import { getMonthName, getCurrency } from "../../utils/utilsFunction";
 
 const BudgetCard = ({budget})=>{
   return (
     <div className="w-full mx-2 px-4 py-8 shadow-md">
           <div className="flex justify-between">
             <span>Budget</span>
-            <span>{budget?.data?.month ? getMonthName(budget?.data?.month) : 'Month'}</span>
+            <span>{budget?.month}</span>
           </div>
           <hr className="my-4" />
           <div className="flex flex-col space-y-2 text-gray-900">
@@ -15,16 +15,16 @@ const BudgetCard = ({budget})=>{
             <div className="flex space-x-2 w-full">
               <div className="bg-green-200 rounded-md p-5 w-1/2 text-center text-sm">
                 <span className="block font-bold">Budget</span>
-                Rp. 4.000.000
+                {budget?.budget}
               </div> 
               <div className="bg-red-200 rounded-md p-5 w-1/2 text-center text-sm">
                 <span className="block font-bold">Used</span>
-                Rp. 1.000.000
+                {budget?.used}
               </div>
             </div>
             <div className="bg-gray-200 rounded-md p-5 w-full text-center text-lg">
               <span className="block font-bold">Remaining</span>
-              {budget?.data?.value ? budget?.data?.value : 0}
+              {budget?.remaining}
             </div>
           </div>
       
@@ -35,7 +35,12 @@ const BudgetCard = ({budget})=>{
 export default function Home() {
 
   const [dataExpense, setDataExpense] = useState({});
-  const [dataBudget, setDataBudget] = useState({});
+  const [dataBudget, setDataBudget] = useState({
+    month: 'Month',
+    budget: 0,
+    used: 0,
+    remaining: 0,
+  });
 
   useEffect(()=>{
     // const fetchDataExpense = async ()=>{
@@ -47,21 +52,31 @@ export default function Home() {
     // console.log('hello');
     // fetchDataExpense();
 
-    const fetchDataExpense = async ()=>{
-      const response = await getDataExpenses();
-      console.log(response);
-      setDataExpense(response);
+    const fetchAllData = async ()=>{
+      const responseExpenses = await getDataExpenses();
+      const responseBudget = await getDataBudget(2);
+
+      setDataExpense(responseExpenses);
+      // setDataBudget(responseBudget);
+      // set data buget
+      console.log(responseExpenses.data[0].value);
+      
+      const tempUsedBudget = responseExpenses?.data?.reduce((n, {value})=>{
+        return n+value
+      },0);
+
+      // console.log('used', tempUsedBudget)
+      setDataBudget({
+        month: getMonthName(responseBudget?.data?.month),
+        budget: getCurrency(responseBudget?.data?.value),
+        used: getCurrency(tempUsedBudget),
+        remaining: getCurrency(responseBudget?.data?.value-tempUsedBudget),
+      });
     }
 
-    const fetchDataBudget = async ()=>{
-      const response = await getDataBudget(2);
-      console.log('budget', response);
-      setDataBudget(response);
-    }
 
     // run function fetch
-    fetchDataExpense();
-    fetchDataBudget();
+    fetchAllData();
   }, []);
 
   return (<><div className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gray-50 py-12 space-y-6 px-5">

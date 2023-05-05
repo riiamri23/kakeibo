@@ -67,3 +67,10 @@ export function getMonthName(month){
 
     return monthName;
 }
+
+export function getCurrency(val){
+    return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR"
+    }).format(val);
+}
