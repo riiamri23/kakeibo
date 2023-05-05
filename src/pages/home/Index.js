@@ -1,5 +1,36 @@
 import React, { useEffect, useState } from "react";
 import {getDataBudget, getDataExpenses} from "../../services/budgetService";
+import { getMonthName } from "../../utils/utilsFunction";
+
+const BudgetCard = ({budget})=>{
+  return (
+    <div className="w-full mx-2 px-4 py-8 shadow-md">
+          <div className="flex justify-between">
+            <span>Budget</span>
+            <span>{budget?.data?.month ? getMonthName(budget?.data?.month) : 'Month'}</span>
+          </div>
+          <hr className="my-4" />
+          <div className="flex flex-col space-y-2 text-gray-900">
+
+            <div className="flex space-x-2 w-full">
+              <div className="bg-green-200 rounded-md p-5 w-1/2 text-center text-sm">
+                <span className="block font-bold">Budget</span>
+                Rp. 4.000.000
+              </div> 
+              <div className="bg-red-200 rounded-md p-5 w-1/2 text-center text-sm">
+                <span className="block font-bold">Used</span>
+                Rp. 1.000.000
+              </div>
+            </div>
+            <div className="bg-gray-200 rounded-md p-5 w-full text-center text-lg">
+              <span className="block font-bold">Remaining</span>
+              {budget?.data?.value ? budget?.data?.value : 0}
+            </div>
+          </div>
+      
+    </div>
+  );
+}
 
 export default function Home() {
 
@@ -23,8 +54,8 @@ export default function Home() {
     }
 
     const fetchDataBudget = async ()=>{
-      const response = await getDataBudget('Februari');
-      console.log(response);
+      const response = await getDataBudget(2);
+      console.log('budget', response);
       setDataBudget(response);
     }
 
@@ -56,19 +87,7 @@ export default function Home() {
   </div>
   <div className="relative mx-auto w-full max-w-2xl flex flex-col justify-between md:flex-row md:space-x-5">
     <div className="flex flex-col w-full mb-5 md:w-1/2">
-      <div className="w-full mx-2 px-4 py-8 shadow-md">
-        <div className="flex justify-between">
-          <span>Budget</span>
-          <span>November</span>
-        </div>
-        <hr className="my-4" />
-
-        {/* <div className="relative h-1 w-full bg-gray-300">
-          <span className="absolute right-0">Today</span>
-          <div className="absolute bg-black w-1 h-3 right-8"></div>
-          <div className="h-full w-9/12 bg-green-500"></div>
-        </div> */}
-      </div>
+      <BudgetCard budget={dataBudget} />
       <div className="w-full mx-2 px-4 py-8 shadow-md">
         <div className="flex justify-between">
           <span>Bills</span>

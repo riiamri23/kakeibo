@@ -1,4 +1,5 @@
 import {spreadsheetLink} from '../constants/constants.js';
+// import { getMonthName } from '../utils/utilsFunction.js';
 
 function getFormattedJson(json){
 
@@ -31,7 +32,10 @@ export async function getDataBudget(month){
     result = await response.text(),
     json = JSON.parse(result.replace(/.*google.visualization.Query.setResponse\({(.*?)}\);?/s, '{$1}'));
     let data = getFormattedJson(json);
-    if(month !== '') data.data = data.data.find(val => val.bulan === month);
+    if(month !== '') data.data = data.data.find(val => val.month === month);
 
+    // data.data = data?.data?.map((val)=>{
+    //     return {...val, month: getMonthName(val.month)}
+    // });
     return data;
 }
