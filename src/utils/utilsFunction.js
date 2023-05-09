@@ -63,7 +63,6 @@ export function getMonthName(month){
         default:
             break;
     }
-    console.log(monthName);
 
     return monthName;
 }
@@ -73,4 +72,8 @@ export function getCurrency(val){
         style: "currency",
         currency: "IDR"
     }).format(val);
+}
+
+export function getDateFormat(){
+    
 }
