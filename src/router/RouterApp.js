@@ -11,7 +11,7 @@ export default function RouterApp() {
         <Router>
             <Routes>
                 <Route index element={<Home />} />
-                <Route index element={<Budget />} />
+                <Route path="budget" element={<Budget />} />
                 <Route path="test" element={<Test />} />
                 <Route path="test2" element={<Test2 />} />
             </Routes>
