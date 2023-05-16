@@ -39,3 +39,13 @@ export async function getDataBudget(month){
     // });
     return data;
 }
+
+export async function getDataBills(){
+    const response = await fetch(spreadsheetLink('bills')),
+    result = await response.text(),
+    json = JSON.parse(result.replace(/.*google.visualization.Query.setResponse\({(.*?)}\);?/s, '{$1}'));
+    let data = getFormattedJson(json);
+    
+
+    return data;
+}

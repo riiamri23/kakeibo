@@ -12,53 +12,58 @@ export function getFormattedDate(paramDate){
     return `${day}-${month}-${year}`;
 }
 
-export function getMonthName(month){
+// type = long || type = sort
+export function getMonthName(month, type = "long"){
+    const typeLong = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const typeSort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     let monthName = "";
+    const monthType = type === 'long' ? typeLong : typeSort;
+
     switch(month){
         case 1:
-            monthName = "January";
+            monthName = monthType[0];
             break;
         case 2:
-            monthName = "February";
+            monthName = monthType[1];
             break;
         case 3:
-            monthName = "March";
+            monthName = monthType[2];
             break;
 
         case 4:
-            monthName = "April";
+            monthName = monthType[3];
             break;
 
         case 5:
-            monthName = "May";
+            monthName = monthType[4];
             break;
 
         case 6:
-            monthName = "June";
+            monthName = monthType[5];
             break;
 
         case 7:
-            monthName = "July";
+            monthName = monthType[6];
             break;
 
         case 8:
-            monthName = "August";
+            monthName = monthType[7];
             break;
 
         case 9:
-            monthName = "September";
+            monthName = monthType[8];
             break;
 
         case 10:
-            monthName = "October";
+            monthName = monthType[9];
             break;
 
         case 11:
-            monthName = "November";
+            monthName = monthType[10];
             break;
 
         case 12:
-            monthName = "December";
+            monthName = monthType[11];
             break;
         default:
             break;
