@@ -49,3 +49,12 @@ export async function getDataBills(){
 
     return data;
 }
+
+export async function saveDataBudget(data= {}){
+    console.log('testing');
+    const response = await fetch('https://script.google.com/macros/s/AKfycbxKbSJBSt03HzwSvbKJFh5WN9g1FKNLAB9WFkT36tIGHR8FAQSW2zIhx0VNt1gYSHk2/exec?path=Budget&action=write&Month=1&Year=2024&Value=2000&Created_date=2024-03-21&Created_by=amri&Modified_date=2024-04-12&Modified_by=amri'),
+    result = await response.text();
+    console.log(result);
+    
+    return result;
+}

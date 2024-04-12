@@ -1,5 +1,6 @@
 
 import { NavCard } from "../../components/nav/Index";
+import { saveDataBudget } from "../../services/budgetService";
 
 export default function Budget(){
     return (<>
@@ -23,7 +24,7 @@ export default function Budget(){
                     </div>
                 </div>
                 <hr className="my-4" />
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={saveDataBudget({test:''})}>
                     Submit
                 </button>
             </div>
